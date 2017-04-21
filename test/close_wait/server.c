@@ -90,7 +90,7 @@ create_and_bind (char *port)
 
   return sfd;
 }
-
+int gi = 0;
 int main(int argc, char* argv[])
 {
     struct sockaddr_in servaddr, cliaddr;
@@ -218,6 +218,7 @@ int main(int argc, char* argv[])
                     char buf[512];
 
                     count = read(events[i].data.fd, buf, sizeof(buf)); 
+                    printf("\n[%d]client socket read return %d\n", gi++, count);
                     if (count == -1) {
                         if (errno != EAGAIN) {
                             perror("read");
@@ -243,7 +244,7 @@ int main(int argc, char* argv[])
                     printf("Closed connection on descripor %d\n", events[i].data.fd);
                     /*Closing the descriptor will make epoll remove it 
                      * from the set of descriptors which are monitored*/
-                    close(events[i].data.fd);
+                    //close(events[i].data.fd);
                 }
 
             } //end else..
