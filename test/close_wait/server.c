@@ -91,6 +91,21 @@ create_and_bind (char *port)
   return sfd;
 }
 int gi = 0;
+
+#define EP_STR "EPOLLIN = 0x001, \ 
+    EPOLLPRI = 0x002, \
+    EPOLLOUT = 0x004, \
+    EPOLLRDNORM = 0x040, \
+    EPOLLRDBAND = 0x080,\
+    EPOLLWRNORM = 0x100,\
+    EPOLLWRBAND = 0x200,\
+    EPOLLMSG = 0x400,   \
+    EPOLLERR = 0x008,   \
+    EPOLLHUP = 0x010,   \
+    EPOLLRDHUP = 0x2000,\
+    EPOLLONESHOT = (1 << 30),   \
+    EPOLLET = (1 << 31)\n"         
+
 int main(int argc, char* argv[])
 {
     struct sockaddr_in servaddr, cliaddr;
@@ -98,6 +113,7 @@ int main(int argc, char* argv[])
     int listenfd, connfd;
     char buf[MAXLINE];
     char str[INET_ADDRSTRLEN];
+    printf(EP_STR);
     //int i, n;
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     int opt = 1;
@@ -139,17 +155,34 @@ int main(int argc, char* argv[])
 
     while (1) {
         int n, i;
+        printf("[%d]before epoll_wait\n", gi++);
         n = epoll_wait(epfd, events, MAX_EVENTS, -1);
+        printf("[%d]after epoll_wait: n:%d\n", gi++, n);
 
         for (i = 0; i < n; ++i) {
+
+            printf("\n[%d]sock:%d event:%x\n", gi++,  events[i].data.fd, events[i].events);
 
             if ( (events[i].events & EPOLLERR) ||
                     (events[i].events & EPOLLHUP) ||
                     (!(events[i].events & EPOLLIN)) )
             {
+                fprintf(stderr, EP_STR);
+
+                if  (events[i].events & EPOLLERR) {
+                    fprintf(stderr, "~EPOLLERR~");
+                }
+
+                if (events[i].events & EPOLLHUP)  {
+                    fprintf(stderr, "~EPOLLHUP~");
+                }
+
+                if (events[i].events & EPOLLRDHUP)  {
+                    fprintf(stderr, "~EPOLLRDHUP~");
+                }
                 /*An error has occured on this fd, or the socket is 
                  * not ready for reading (why were we notified then?)*/
-                fprintf(stderr, "epoll error\n");
+                fprintf(stderr, "########epoll error\n");
                 close(events[i].data.fd);
                 continue;
             }
@@ -191,7 +224,7 @@ int main(int argc, char* argv[])
                     abort ();
 
                   event.data.fd = infd;
-                  event.events = EPOLLIN | EPOLLET;
+                  event.events = EPOLLIN |EPOLLRDHUP| EPOLLET;
                   s = epoll_ctl(epfd, EPOLL_CTL_ADD, infd, &event);
                   if (s == -1 ) {
                       perror("epoll_ctl");
@@ -232,7 +265,7 @@ int main(int argc, char* argv[])
                         break;
                     }
 
-                    int s = write(1, buf, count);
+                    int s = write(events[i].data.fd, buf, count);
                     if (s < 0) {
                         perror("write");
                         abort();

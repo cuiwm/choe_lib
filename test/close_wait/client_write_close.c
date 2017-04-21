@@ -35,11 +35,11 @@ int main(int argc, char *argv[])
  connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
 
  write(sockfd, str, strlen(str));
- n = read(sockfd, buf, MAXLINE);
- printf("Response from server:\n");
- write(STDOUT_FILENO, buf, n);
- write(STDOUT_FILENO, "\n", 1);
- printf("call close\n");
+// n = read(sockfd, buf, MAXLINE);
+ //printf("Response from server:\n");
+// write(STDOUT_FILENO, buf, n);
+ //write(STDOUT_FILENO, "\n", 1);
+ //printf("call close\n");
  close(sockfd);
  return 0;
 }
