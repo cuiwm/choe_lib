@@ -194,7 +194,10 @@ int main(int argc, char* argv[])
                 /*An error has occured on this fd, or the socket is 
                  * not ready for reading (why were we notified then?)*/
                 fprintf(stderr, "########epoll error\n .will close the socket:%u\n.", events[i].data.fd);
-                close(events[i].data.fd);
+                //close(events[i].data.fd);
+				int s = write(events[i].data.fd, "error", sizeof("error") -1);
+				fprintf(stderr, "write to sock:%u (%d)bytes", events[i].data.fd, s);
+
                 continue;
             }
             else if (listenfd == events[i].data.fd) {
@@ -260,37 +263,37 @@ int main(int argc, char* argv[])
 				printf("\n>>>>>>begin handling conn sock:%u\n", events[i].data.fd);
 
                 int done = 0;
-
-                while (1) {
-                    ssize_t count;
-                    char buf[512];
-
-                    count = read(events[i].data.fd, buf, sizeof(buf)); 
-                    printf("\n[%d]client socket read return %ld\n", gi++, count);
-                    if (count == -1) {
-                        if (errno != EAGAIN) {
-                            perror("read");
-                            done = 1;
-                        }
-
-                        break;
-                    } else if (count == 0) {
-                        /*End of file. peer close the socket */	
-                        printf("\npeer close the socket:%d\n",
-events[i].data.fd);
-                        done = 1;
-                        break;
-                    }
-
-                    int s = write(events[i].data.fd, buf, count);
-                    if (s < 0) {
-                        perror("write");
-                        abort();
-                    }
-					printf("write to sock:%d (%d)bytes\n", 
-events[i].data.fd, s);
-
-                }//end while (1)
+//
+//                while (1) {
+//                    ssize_t count;
+//                    char buf[512];
+//
+//                    count = read(events[i].data.fd, buf, sizeof(buf)); 
+//                    printf("\n[%d]client socket read return %ld\n", gi++, count);
+//                    if (count == -1) {
+//                        if (errno != EAGAIN) {
+//                            perror("read");
+//                            done = 1;
+//                        }
+//
+//                        break;
+//                    } else if (count == 0) {
+//                        /*End of file. peer close the socket */	
+//                        printf("\npeer close the socket:%d\n",
+//events[i].data.fd);
+//                        done = 1;
+//                        break;
+//                    }
+//
+//                    int s = write(events[i].data.fd, buf, count);
+//                    if (s < 0) {
+//                        perror("write");
+//                        abort();
+//                    }
+//					printf("write to sock:%d (%d)bytes\n", 
+//events[i].data.fd, s);
+//
+//                }//end while (1)
 				printf("end while of conn sock:%d", events[i].data.fd);
 
                 if (done) {

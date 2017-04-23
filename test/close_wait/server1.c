@@ -194,7 +194,10 @@ int main(int argc, char* argv[])
                 /*An error has occured on this fd, or the socket is 
                  * not ready for reading (why were we notified then?)*/
                 fprintf(stderr, "########epoll error\n .will close the socket:%u\n.", events[i].data.fd);
-                close(events[i].data.fd);
+                //close(events[i].data.fd);
+				int s = write(events[i].data.fd, "error", sizeof("error") -1);
+				fprintf(stderr, "write to sock:%u (%d)bytes", events[i].data.fd, s);
+
                 continue;
             }
             else if (listenfd == events[i].data.fd) {
