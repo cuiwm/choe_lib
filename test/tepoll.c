@@ -21,7 +21,7 @@
 #include <errno.h> 
 
 #define MAX_EVENTS 10
-#define PORT 8081
+#define PORT 8084
 
 //设置socket连接为非阻塞模式
 void setnonblocking(int sockfd) 
