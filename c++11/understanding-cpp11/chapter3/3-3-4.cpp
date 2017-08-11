@@ -15,12 +15,12 @@ public:
         h.d = nullptr;                  // 将临时值的指针成员置空
         cout << "Move construct: " << ++n_mvtr << endl;
     }
-#if 0
+//#if 0
     HasPtrMem(const HasPtrMem && h): d(h.d) { // 移动构造函数
-    //    h.d = nullptr;                  // 将临时值的指针成员置空
+        //h.d = nullptr;                  // 将临时值的指针成员置空
         cout << "Const Move construct: " << ++n_mvtr << endl;
     }
-#endif
+//#endif
     ~HasPtrMem() { 
         delete d;
         cout << "Destruct: " << ++n_dstr << endl;
