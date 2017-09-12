@@ -1,0 +1,3 @@
+all:
+	if [ "$(BUILD)" = "debug" ]; then  echo "build debug"; else echo "build release"; fi
+	@echo "done"

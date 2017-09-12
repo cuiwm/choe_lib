@@ -1,0 +1,3 @@
+all:
+	CC=arm-linux-gcc
+	echo $(CC)
