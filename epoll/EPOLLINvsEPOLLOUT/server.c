@@ -65,6 +65,8 @@ int setnonblocking(int fd)
 	return 0;
 }
 
+int g_tick = 0;
+
 int main(void)
 {
 	char buf[MAXBUF];
@@ -156,8 +158,13 @@ int main(void)
 			}
 			else
 			{
+				++g_tick;
+				printf("[%d] data connection event\n", g_tick);
+
 				if(events[n].events & EPOLLIN)
 				{
+					printf("[%d]when EPOLLIN is triggered\n", g_tick);
+
 					if( (len = readn(events[n].data.fd, buf, MAXBUF)) == -1)
 					{
 						perror("readn");
@@ -165,18 +172,19 @@ int main(void)
 					}
 					else if(len == 0)
 					{
+					printf("[%d]peer close\n", g_tick);
 						close(events[n].data.fd);
 						ev.data.fd = events[n].data.fd;
 						epoll_ctl(epollfd, EPOLL_CTL_DEL, events[n].data.fd, &ev);
 					}
 
 					buf[len] = '\0';
-					printf("received %s\n", buf);
+					printf("[%d] received <%s>\n", g_tick, buf);
 				}
 
 				if(events[n].events & EPOLLOUT)
 				{
-					printf("when EPOLLIN is triggered, EPOLLOUT is also triggered\n");
+					printf("[%d] EPOLLOUT is also triggered\n", g_tick);
 				}
 			}
 		}

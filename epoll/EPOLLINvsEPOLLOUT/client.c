@@ -36,7 +36,7 @@ int main(void)
 
 	for(n = 0; n < 10; n++)
 	{
-		snprintf(buf, MAXBUF, "time %d", n);
+		snprintf(buf, MAXBUF, "loop time %dth", n);
 		len = strlen(buf);
 		if(write(fd, buf, len) != len)
 		{
@@ -48,6 +48,7 @@ int main(void)
 	}
 
 	close(fd);
+	printf("after close");
 
 	return 0;
 }
